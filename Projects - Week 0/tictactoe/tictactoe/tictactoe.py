@@ -159,7 +159,7 @@ def utility(board):
     else:
         return 0
 
-
+#Version 3 - "Last stand" update
 def minimax(board):
     """
     Returns the optimal action for the current player on the board.
@@ -169,16 +169,18 @@ def minimax(board):
     last_action = ()
     if player(board) == X:
         player_action_set = actions(board)
+        best_value = -1000
         for action_player in player_action_set:
             player_board = result(board, action_player)
+            if utility(player_board) == 1:
+                return action_player
             enemy_action_set = actions(player_board)
-            worst_value = 1000
-            best_value = -1000
+            worst_value = 0
+            
             for action_enemy in enemy_action_set:
                 enemy_board = result(player_board, action_enemy)
                 current_value = utility(enemy_board)
-                if worst_value > current_value:
-                    worst_value = current_value
+                worst_value = worst_value + current_value
             if best_value < worst_value:
                 last_action = action_player
                 if worst_value == 0:
@@ -186,18 +188,23 @@ def minimax(board):
                 else:
                     best_value = worst_value
         return last_action
+    
+    #Player X works fine
+    
     else:
         player_action_set = actions(board)
+        best_value = 1000
         for action_player in player_action_set:
             player_board = result(board, action_player)
+            if utility(player_board) == -1:
+                return action_player
             enemy_action_set = actions(player_board)
-            worst_value = -1000
-            best_value = 1000
+            worst_value = 0
+            
             for action_enemy in enemy_action_set:
                 enemy_board = result(player_board, action_enemy)
                 current_value = utility(enemy_board)
-                if worst_value < current_value:
-                    worst_value = current_value
+                worst_value = worst_value + current_value
             if best_value > worst_value:
                 last_action = action_player
                 if worst_value == 0:
@@ -205,11 +212,29 @@ def minimax(board):
                 else:
                     best_value = worst_value
         return last_action
-                    
+#Player 2 works fine now :D
             
                 
-                
-                
+#Version 2 - Working                
+    # if player(board) == X:
+    #     player_action_set = actions(board)
+    #     for action_player in player_action_set:
+    #         player_board = result(board, action_player)
+    #         enemy_action_set = actions(player_board)
+    #         worst_value = 1000
+    #         best_value = -1000
+    #         for action_enemy in enemy_action_set:
+    #             enemy_board = result(player_board, action_enemy)
+    #             current_value = utility(enemy_board)
+    #             if worst_value > current_value:
+    #                 worst_value = current_value
+    #         if best_value < worst_value:
+    #             last_action = action_player
+    #             if worst_value == 0:
+    #                 return action_player
+    #             else:
+    #                 best_value = worst_value
+    #     return last_action            
                 
                 
                 
@@ -218,7 +243,7 @@ def minimax(board):
 
 
 
-
+#Version 1 - Does not work
     # if terminal(board):
     #     return None
     # posibilities = []
