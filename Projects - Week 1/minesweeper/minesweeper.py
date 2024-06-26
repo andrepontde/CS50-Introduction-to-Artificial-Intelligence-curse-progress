@@ -219,8 +219,7 @@ class MinesweeperAI():
             self.mark_safe(safe)
         
         for sentence in self.knowledge:
-            if sentence.count == len(sentence.cells):
-                print(f"This is the mine sentence{sentence}")
+            if 1 <= len(sentence.cells):
                 for explosive in sentence.known_mines():
                     self.mines.add(explosive)
         
@@ -230,10 +229,22 @@ class MinesweeperAI():
         #GPT :C
         self.knowledge = [sentence for sentence in self.knowledge if sentence.cells]
         
+        new_knowledge = []
+        
+        for sentence1 in self.knowledge:
+            for sentence2 in self.knowledge:
+                if sentence1 != sentence2 and sentence1.cells.issubset(sentence2.cells):
+                    new_cells = sentence2.cells - sentence1.cells
+                    new_count = sentence2.count - sentence1.count
+                    new_sentence = Sentence(new_cells, new_count)
+                    if new_sentence not in self.knowledge:
+                        print(f"The new generated sentence is {new_sentence}")
+                        new_knowledge.append(new_sentence)
+        
+        self.knowledge.extend(new_knowledge)
+                    
+        
         print("New Move")
-        for sent in self.knowledge:
-            print(sent)
-
         print(f"Safes: {self.safes}")
         print(f"Mines: {self.mines}")
         
@@ -270,11 +281,16 @@ class MinesweeperAI():
             1) have not already been chosen, and
             2) are not known to be mines
         """
+        choices = []
         
         for i in range(self.height):
             for j in range(self.width):
-                ranCell = (i,j)
-                if ranCell not in self.moves_made and ranCell not in self.mines:
-                    return ranCell
+                if (i, j) not in self.moves_made and (i, j) not in self.mines:
+                    
+                    choices.append((i,j))
+                
+        if choices:
+            return random.choice(choices)
+        return None
                 
         
