@@ -208,21 +208,34 @@ class MinesweeperAI():
         newSentence = Sentence(surroundings, count)
         safes = newSentence.known_safes()
         
-        mines = newSentence.known_mines()
-        
-        for safe in safes:
-            self.mark_safe(safe)
-            self.safes.add(safe)
-        
-        for mine in mines:
-            self.mark_mine(mine)
-            self.mines.add(mine)
-        
         self.knowledge.append(newSentence)
+
+        for sentence in self.knowledge:
+            if sentence.count == 0:
+                for ground in sentence.known_safes():
+                    self.safes.add(ground)
+            
+        for safe in self.safes:
+            self.mark_safe(safe)
+        
+        for sentence in self.knowledge:
+            if sentence.count == len(sentence.cells):
+                print(f"This is the mine sentence{sentence}")
+                for explosive in sentence.known_mines():
+                    self.mines.add(explosive)
+        
+        for mine in self.mines:
+            self.mark_mine(mine)
+        
+        #GPT :C
+        self.knowledge = [sentence for sentence in self.knowledge if sentence.cells]
         
         print("New Move")
         for sent in self.knowledge:
             print(sent)
+
+        print(f"Safes: {self.safes}")
+        print(f"Mines: {self.mines}")
         
         '''
         
