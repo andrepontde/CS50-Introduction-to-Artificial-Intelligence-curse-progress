@@ -198,13 +198,14 @@ class MinesweeperAI():
         
         surroundings = set()
         
+        #Loops over the surrounding cells and appends them to the new sentence if they are within the range of the board
         for i in range(cell[0] - 1, cell[0] + 2):
             for j in range(cell[1] - 1, cell[1] + 2):
                 newCell = (i,j)
-                surroundings.add(newCell)
-                
+                if i in range(self.height) and j in range(self.width):
+                    surroundings.add(newCell)
+                    
         newSentence = Sentence(surroundings, count)
-        
         safes = newSentence.known_safes()
         
         mines = newSentence.known_mines()
@@ -218,6 +219,10 @@ class MinesweeperAI():
             self.mines.add(mine)
         
         self.knowledge.append(newSentence)
+        
+        print("New Move")
+        for sent in self.knowledge:
+            print(sent)
         
         '''
         
