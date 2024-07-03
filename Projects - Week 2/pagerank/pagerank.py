@@ -1,5 +1,6 @@
 import os
 import random
+import math
 import re
 import sys
 
@@ -57,7 +58,7 @@ def transition_model(corpus, page, damping_factor):
     linked to by `page`. With probability `1 - damping_factor`, choose
     a link at random chosen from all pages in the corpus.
     """
-    pages = crawl(corpus)
+    pages = corpus
     
     remaining = 1 - damping_factor
     
@@ -69,7 +70,7 @@ def transition_model(corpus, page, damping_factor):
         for site in pages.keys():
             probability[site] = percentage
         return probability
-    
+
     else:
         for site in pages.keys():
             all_sites[site] = 0.0
@@ -126,7 +127,7 @@ def sample_pagerank(corpus, damping_factor, n):
     their estimated PageRank value (a value between 0 and 1). All
     PageRank values should sum to 1.
     """
-    pages = crawl(corpus)
+    pages = corpus
     ran = random.choice(list(pages.keys()))
     results = []
     sample = transition_model(corpus, ran, damping_factor)
@@ -147,12 +148,6 @@ def sample_pagerank(corpus, damping_factor, n):
     return full_sample
         
         
-    
-    
-    
-
-
-
 def iterate_pagerank(corpus, damping_factor):
     """
     Return PageRank values for each page by iteratively updating
@@ -162,24 +157,39 @@ def iterate_pagerank(corpus, damping_factor):
     their estimated PageRank value (a value between 0 and 1). All
     PageRank values should sum to 1.
     """
-    #This is the formula simply transcribed
+    pages = corpus
+    N = len(pages)
+
+    # Initialize pagerank values
+    page_rank = {page: 1 / N for page in pages}
     
-    pages = crawl(corpus)
-    single_rank = {}
-    
-    for site in pages.keys():
-        part1 = (1-damping_factor)/len(pages.keys())
-        part2 = 0
-        for page in pages[site]:
-            #Should I change the number of samples generated?
-            pr = sample_pagerank(corpus, damping_factor, 1000)
-            part2 = part2 + pr[page]/len(pages[page])
-        sum_pr = part2 + part1
-        #Cambiar el valor al final!!!!!!!!!!!!
-        single_rank[site] = sum_pr
-    
-    return single_rank
+    keepTrying = True
+    while keepTrying:
+        new_rank = {}
+        # Calculate new rank values based on the current ranks
+        for page in pages:
+            rank_sum = 0
+            for possible_page in pages:
+                if page in pages[possible_page]:
+                    rank_sum += page_rank[possible_page] / len(pages[possible_page])
+                if not pages[possible_page]:  # If a page has no links
+                    rank_sum += page_rank[possible_page] / N
+            new_rank[page] = (1 - damping_factor) / N + damping_factor * rank_sum
+
+        # Check convergence
+        keepTrying = False
+        for page in pages:
+            if not math.isclose(new_rank[page], page_rank[page], abs_tol=0.001):
+                keepTrying = True
+            page_rank[page] = new_rank[page]
+
+    return page_rank
+
+
 
 
 if __name__ == "__main__":
     main()
+
+
+
